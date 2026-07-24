@@ -1,113 +1,70 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#163e2f">
-<title>Munster Stock</title>
-<style>
-:root{--g:#163e2f;--g2:#235b45;--bg:#f7f3ea;--card:#fff;--line:#dfe6e2;--muted:#6b7772;--ok:#2e7d32;--bad:#b3261e;--warn:#ad6800}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#1d2522}
-header{position:sticky;top:0;z-index:5;background:var(--g);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 14px #0002}
-.logo{font-size:36px} h1{font-size:20px;margin:0} header p{margin:2px 0 0;font-size:13px;opacity:.82}
-main{max-width:980px;margin:auto;padding:14px 12px 40px}
-.panel,.card,.summary{background:#fff;border-radius:15px;box-shadow:0 8px 24px rgba(20,50,39,.08)}
-.panel{padding:13px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px}
-input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0} button{border:0;border-radius:10px;padding:11px 13px;font-weight:750;font:inherit;cursor:pointer}
-.primary{background:var(--g);color:#fff} .secondary{background:#fff;color:var(--g);border:1px solid var(--g)} .danger{background:#fff0ef;color:var(--bad)}
-.category h2{font-size:16px;margin:18px 3px 7px}
-.card{padding:11px;margin:8px 0;border:2px solid transparent;transition:.2s}.card.state-ok{border-color:#96d29a;background:#f5fff6}.card.state-bad{border-color:#efaaa5;background:#fff7f6}.card.state-warn{border-color:#e8c27c;background:#fffaf1} .title{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:800;margin-bottom:9px}
-.status{font-size:12px;padding:4px 8px;border-radius:999px;background:#eef2f0;color:var(--muted)} .ok{background:#e8f5e9;color:var(--ok)} .bad{background:#ffebee;color:var(--bad)} .warn{background:#fff4dd;color:var(--warn)}
-.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;align-items:end} .calc{background:#f4f7f5;border-radius:9px;padding:9px;text-align:center;font-weight:800;min-height:40px}
-.summary{padding:13px;margin-top:17px} .summary h2{margin:0 0 10px} .sumgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.sumgrid div{background:#f4f7f5;border-radius:10px;text-align:center;padding:10px} .sumgrid span{display:block;font-size:22px;font-weight:900} .sumgrid small{color:var(--muted)}
-.bottom button{flex:1;min-width:220px;padding:14px}
-#voiceStatus{display:none;background:#eaf4ef;color:var(--g);padding:10px;border-radius:10px;margin-bottom:10px}
-dialog{width:min(92vw,720px);border:0;border-radius:15px;padding:0} dialog::backdrop{background:#0007} .dh{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--line)} .dc{padding:14px;max-height:70vh;overflow:auto} .row{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
-@media(max-width:720px){.panel{grid-template-columns:1fr 1fr}.panel>div:last-child{grid-column:1/-1}.grid{grid-template-columns:repeat(2,1fr)}.sumgrid{grid-template-columns:repeat(2,1fr)}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#123c2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <title>Munster Stock</title>
 </head>
 <body>
-<header><div class="logo">☘</div><div><h1>Munster Stock</h1><p>Control diario de bebidas</p></div></header>
+<header>
+  <div class="logo"><img src="icon.svg" alt=""></div>
+  <div>
+    <h1>Munster Stock</h1>
+    <p>Control diario de bebidas</p>
+  </div>
+</header>
+
 <main>
-<section class="panel">
-<div><label>Fecha</label><input id="date" type="date"></div>
-<div><label>Turno</label><select id="shift"><option>Mañana</option><option>Noche</option></select></div>
-<div><label>Responsable</label><input id="resp" placeholder="Nombre"></div>
-</section>
+  <section class="panel">
+    <div>
+      <label for="date">Fecha</label>
+      <input id="date" type="date">
+    </div>
+    <div>
+      <label for="shift">Turno</label>
+      <select id="shift">
+        <option>Mañana</option>
+        <option>Noche</option>
+      </select>
+    </div>
+    <div>
+      <label for="resp">Responsable</label>
+      <input id="resp" placeholder="Nombre">
+    </div>
+  </section>
 
-<div class="actions">
-<button class="primary" id="voice">🎤 Dictar conteo</button>
+  <div class="actions">
+    <button class="primary" id="voice">🎤 Dictar conteo</button>
+    <button class="danger" id="reset">➕ Nuevo conteo</button>
+  </div>
 
-<button class="danger" id="reset">➕ Nuevo conteo</button>
-</div>
-<div id="voiceStatus"></div>
-<div id="products"></div>
+  <div id="voiceStatus"></div>
+  <div id="products"></div>
 
-<section class="summary"><h2>Resumen</h2><div class="sumgrid">
-<div><span>19</span><small>Productos</small></div>
-<div><span id="okc">0</span><small>Correctos</small></div>
-<div><span id="missc">0</span><small>Faltantes</small></div>
-<div><span id="extrac">0</span><small>Sobrantes</small></div>
-</div></section>
+  <section class="summary">
+    <h2>Resumen</h2>
+    <div class="sumgrid">
+      <div><span id="totalProducts">19</span><small>Productos</small></div>
+      <div><span id="okc">0</span><small>Correctos</small></div>
+      <div><span id="missc">0</span><small>Faltantes</small></div>
+      <div><span id="extrac">0</span><small>Sobrantes</small></div>
+    </div>
+  </section>
 
-<div class="actions bottom">
+  <div class="actions bottom">
+    <button class="secondary" id="share">📲 Compartir por WhatsApp</button>
+  </div>
 
-<button class="secondary" id="share">Compartir por WhatsApp</button>
-</div>
-<footer style="text-align:center;color:#6b7772;font-size:12px;padding:8px 0 24px">Munster Stock v1.0</footer></main>
+  <footer>Munster Stock v1.0</footer>
+</main>
 
-
-
-<script>
-const PRODUCTS=[["Aguas", "Agua sin gas"], ["Aguas", "Agua con gas"], ["Aguas saborizadas", "Agua saborizada pomelo"], ["Aguas saborizadas", "Agua saborizada pera"], ["Aguas saborizadas", "Agua saborizada manzana"], ["Aguas saborizadas", "Agua saborizada naranja"], ["Aguas saborizadas", "Agua saborizada limonada"], ["Gaseosas", "Coca-Cola"], ["Gaseosas", "Coca-Cola Zero"], ["Gaseosas", "Pepsi"], ["Gaseosas", "Pepsi Black"], ["Gaseosas", "Fanta"], ["Gaseosas", "Mirinda"], ["Gaseosas", "Sprite"], ["Gaseosas", "7 Up"], ["Tónicas y pomelos", "Schweppes Tónica"], ["Tónicas y pomelos", "Schweppes Pomelo"], ["Tónicas y pomelos", "Paso de los Toros Tónica"], ["Tónicas y pomelos", "Paso de los Toros Pomelo"]];
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-date.value=new Date().toISOString().slice(0,10);
-const key=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'-').toLowerCase();
-
-function render(){
-  const groups=[...new Set(PRODUCTS.map(x=>x[0]))];
-  products.innerHTML=groups.map(g=>`<section class="category"><h2>${g}</h2>${
-    PRODUCTS.filter(x=>x[0]===g).map(([c,n])=>{
-      const k=key(n);
-      return `<article class="card" data-name="${n}"><div class="title"><span>${n}</span><span class="status" id="st-${k}">Sin cargar</span></div>
-      <div class="grid">${['Sistema','Salón','Depósito','Pasillo'].map(f=>`<div><label>${f}</label><input type="number" min="0" step="1" inputmode="numeric" data-p="${n}" data-f="${f}" placeholder="0"></div>`).join('')}
-      <div><label>Total físico</label><div class="calc" id="tot-${k}">0</div></div>
-      <div><label>Diferencia</label><div class="calc" id="dif-${k}">0</div></div></div></article>`;
-    }).join('')
-  }</section>`).join('');
-  $$('input[data-p]').forEach(i=>i.oninput=calc);
-}
-function val(n,f){return Number(document.querySelector(`input[data-p="${n}"][data-f="${f}"]`)?.value||0)}
-function calc(){
- let ok=0,miss=0,extra=0;
- PRODUCTS.forEach(([c,n])=>{
-  const phy=val(n,'Salón')+val(n,'Depósito')+val(n,'Pasillo'), sys=val(n,'Sistema'), dif=phy-sys, k=key(n);
-  $('#tot-'+k).textContent=phy; $('#dif-'+k).textContent=dif>0?'+'+dif:dif;
-  const st=$('#st-'+k), card=document.querySelector(`[data-name="${n}"]`), any=['Sistema','Salón','Depósito','Pasillo'].some(f=>document.querySelector(`input[data-p="${n}"][data-f="${f}"]`).value!=='');
-  st.className='status'; card.className='card';
-  if(!any) st.textContent='Sin cargar';
-  else if(dif===0){st.textContent='Correcto';st.classList.add('ok');card.classList.add('state-ok');ok++}
-  else if(dif<0){st.textContent='Faltan '+Math.abs(dif);st.classList.add('bad');card.classList.add('state-bad');miss++}
-  else{st.textContent='Sobran '+dif;st.classList.add('warn');card.classList.add('state-warn');extra++}
- });
- okc.textContent=ok; missc.textContent=miss; extrac.textContent=extra;
-}
-function data(){
- return {date:date.value,shift:shift.value,responsible:resp.value.trim(),items:PRODUCTS.map(([category,name])=>{
-  const physical=val(name,'Salón')+val(name,'Depósito')+val(name,'Pasillo'),system=val(name,'Sistema');
-  return {category,name,system,salon:val(name,'Salón'),deposito:val(name,'Depósito'),pasillo:val(name,'Pasillo'),physical,difference:physical-system}
- })}
-}
-reset.onclick=()=>{if(confirm('¿Querés comenzar un nuevo conteo? Esto limpiará todos los campos actuales.')){$$('input[data-p]').forEach(i=>i.value='');resp.value='';calc();scrollTo({top:0,behavior:'smooth'})}};
-function shareText(d){const dif=d.items.filter(x=>x.difference!==0),ok=d.items.length-dif.length;let t=`*CONTROL DE STOCK – TURNO ${d.shift.toUpperCase()}*\nFecha: ${d.date}\nResponsable: ${d.responsible||'Sin indicar'}\n\nProductos: ${d.items.length} | Correctos: ${ok} | Con diferencia: ${dif.length}\n`;if(dif.length){t+='\n*Diferencias:*\n';dif.forEach(x=>t+=`• ${x.name}: ${x.difference<0?'faltan '+Math.abs(x.difference):'sobran '+x.difference}\n`)}else t+='\n✅ Todo coincide con el sistema.';return t}
-share.onclick=async()=>{const t=shareText(data());if(navigator.share){try{await navigator.share({title:'Munster Stock',text:t});return}catch(e){}}open('https://wa.me/?text='+encodeURIComponent(t),'_blank')};
-
-function norm(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
-voice.onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return alert('El dictado no está disponible aquí. En Android suele funcionar mejor desde Chrome.');const r=new SR();r.lang='es-AR';r.interimResults=false;voiceStatus.style.display='block';voiceStatus.textContent='Escuchando… Ejemplo: “Coca-Cola, sistema 20, salón 5, depósito 10, pasillo 4”.';r.start();r.onresult=e=>{const tr=e.results[0][0].transcript,t=norm(tr);voiceStatus.textContent='Escuché: '+tr;const p=PRODUCTS.map(x=>x[1]).sort((a,b)=>b.length-a.length).find(n=>t.includes(norm(n)));if(!p)return voiceStatus.textContent+=' — No reconocí la bebida.';let loaded=0;const map={'Sistema':['sistema'],'Salón':['salon'],'Depósito':['deposito','depo'],'Pasillo':['pasillo']};Object.entries(map).forEach(([f,ws])=>{for(const w of ws){const m=t.match(new RegExp(w+'\\s+(\\d+)'));if(m){document.querySelector(`input[data-p="${p}"][data-f="${f}"]`).value=m[1];loaded++;break}}});calc();document.querySelector(`[data-name="${p}"]`).scrollIntoView({behavior:'smooth',block:'center'});voiceStatus.textContent+=loaded?' — Cargado en '+p+'.':' — Reconocí la bebida, pero no los números.'};r.onerror=()=>voiceStatus.textContent='No pude entender. Probá de nuevo o escribí los números.'};
-render();calc();
-</script>
+<script src="app.js"></script>
 </body>
 </html>
