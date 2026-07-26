@@ -191,22 +191,34 @@ function shareText(data) {
   const differences = loaded.filter(item => item.difference !== 0);
   const correct = loaded.filter(item => item.difference === 0).length;
 
-  let text = `*CONTROL DE STOCK – TURNO ${data.shift.toUpperCase()}*\n`;
-  text += `Fecha: ${data.date}\n`;
-  text += `Responsable: ${data.responsible || 'Sin indicar'}\n\n`;
-  text += `Productos controlados: ${loaded.length} | Correctos: ${correct} | Con diferencia: ${differences.length}\n`;
+  const formattedDate = data.date
+    ? data.date.split('-').reverse().join('/')
+    : 'Sin indicar';
+  const missing = differences.filter(item => item.difference < 0).length;
+  const extra = differences.filter(item => item.difference > 0).length;
+
+  let text = '☘️ *MUNSTER STOCK*\n\n';
+  text += `📅 Fecha: ${formattedDate}\n`;
+  text += `🕐 Turno: ${data.shift}\n`;
+  text += `👤 Responsable: ${data.responsible || 'Sin indicar'}\n\n`;
+  text += `📦 Productos controlados: ${loaded.length}\n`;
+  text += `✅ Correctos: ${correct}\n`;
+  text += `🔴 Con faltantes: ${missing}\n`;
+  text += `🟡 Con sobrantes: ${extra}\n`;
 
   if (differences.length) {
-    text += '\n*Diferencias:*\n';
+    text += '\n*DIFERENCIAS*\n\n';
     differences.forEach(item => {
-      text += `• ${item.name}: ${item.difference < 0
-        ? 'faltan ' + Math.abs(item.difference)
-        : 'sobran ' + item.difference}\n`;
+      text += `${item.difference < 0 ? '🔴' : '🟡'} ${item.name}: ${
+        item.difference < 0
+          ? 'faltan ' + Math.abs(item.difference)
+          : 'sobran ' + item.difference
+      }\n`;
     });
   } else if (loaded.length) {
-    text += '\n✅ Todo coincide con el sistema.';
+    text += '\n✅ Todo el stock físico coincide con el sistema.';
   } else {
-    text += '\nNo se cargaron productos.';
+    text += '\n⚠️ No se cargaron productos.';
   }
 
   return text;
@@ -225,6 +237,52 @@ $('#share').addEventListener('click', async () => {
   }
 
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+});
+
+const qrModal = $('#qrModal');
+const qrCode = $('#qrCode');
+const qrPreview = $('#qrPreview');
+
+function closeQrModal() {
+  qrModal.hidden = true;
+  document.body.classList.remove('modal-open');
+}
+
+$('#showQr').addEventListener('click', () => {
+  const text = shareText(collectData());
+
+  if (!window.qrcode) {
+    alert('No pude generar el QR. Actualizá la aplicación y volvé a intentar.');
+    return;
+  }
+
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+
+  try {
+    const qr = qrcode(0, 'M');
+    qr.addData(whatsappUrl);
+    qr.make();
+    qrCode.innerHTML = qr.createSvgTag({
+      cellSize: 5,
+      margin: 4,
+      scalable: true
+    });
+    qrPreview.textContent = text;
+    qrModal.hidden = false;
+    document.body.classList.add('modal-open');
+    $('#closeQr').focus();
+  } catch (error) {
+    alert('El resumen es demasiado largo para generar el QR. Compartilo directamente por WhatsApp.');
+  }
+});
+
+$('#closeQr').addEventListener('click', closeQrModal);
+$('#closeQrBottom').addEventListener('click', closeQrModal);
+qrModal.addEventListener('click', event => {
+  if (event.target === qrModal) closeQrModal();
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !qrModal.hidden) closeQrModal();
 });
 
 function normalize(text) {

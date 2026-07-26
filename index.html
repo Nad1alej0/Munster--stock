@@ -59,11 +59,34 @@
 
   <div class="actions bottom">
     <button class="secondary" id="share">📲 Compartir por WhatsApp</button>
+    <button class="qr-button" id="showQr">▦ Generar QR del resumen</button>
   </div>
 
-  <footer>Munster Stock v1.1</footer>
+  <footer>Munster Stock v1.2</footer>
 </main>
 
+<div class="modal" id="qrModal" hidden>
+  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+    <button class="modal-close" id="closeQr" type="button" aria-label="Cerrar">×</button>
+    <div class="qr-heading">
+      <span class="qr-icon" aria-hidden="true">▦</span>
+      <div>
+        <h2 id="qrTitle">Resumen listo</h2>
+        <p>Escaneá el código con la cámara de tu celular.</p>
+      </div>
+    </div>
+    <div id="qrCode" aria-label="Código QR para abrir el resumen en WhatsApp"></div>
+    <p class="qr-help">Se abrirá WhatsApp con el texto preparado. Después elegís el grupo y tocás Enviar.</p>
+    <details class="qr-preview-wrap">
+      <summary>Ver resumen</summary>
+      <pre id="qrPreview"></pre>
+    </details>
+    <button class="primary modal-done" id="closeQrBottom" type="button">Listo</button>
+  </section>
+</div>
+
+<script src="qrcode.js"></script>
+<script src="qrcode_UTF8.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

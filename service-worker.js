@@ -1,10 +1,12 @@
 
-const CACHE_NAME = 'munster-stock-v1.1';
+const CACHE_NAME = 'munster-stock-v1.2';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './app.js',
+  './qrcode.js',
+  './qrcode_UTF8.js',
   './manifest.json',
   './icon.svg',
   './icon-192.png',
