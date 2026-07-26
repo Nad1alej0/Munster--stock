@@ -8,7 +8,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="styles.css">
   <title>Munster Stock</title>
 </head>
@@ -41,11 +41,10 @@
   </section>
 
   <div class="actions">
-    <button class="primary" id="voice">🎤 Dictar conteo</button>
     <button class="danger" id="reset">➕ Nuevo conteo</button>
   </div>
 
-  <div id="voiceStatus"></div>
+  <div id="voiceStatus" role="status" aria-live="polite"></div>
   <div id="products"></div>
 
   <section class="summary">
@@ -62,7 +61,7 @@
     <button class="secondary" id="share">📲 Compartir por WhatsApp</button>
   </div>
 
-  <footer>Munster Stock v1.0</footer>
+  <footer>Munster Stock v1.1</footer>
 </main>
 
 <script src="app.js"></script>
