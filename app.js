@@ -8,6 +8,10 @@ const shiftInput = $('#shift');
 const responsibleInput = $('#resp');
 const productsContainer = $('#products');
 const voiceStatus = $('#voiceStatus');
+const productSearch = $('#productSearch');
+const clearSearch = $('#clearSearch');
+const searchCount = $('#searchCount');
+const noResults = $('#noResults');
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 let activeVoice = null;
@@ -88,6 +92,43 @@ function render() {
     button.addEventListener('click', () => finishVoice(button.dataset.voiceOk))
   );
 }
+
+function filterProducts() {
+  const query = normalize(productSearch.value.trim());
+  let visibleCount = 0;
+
+  $$('.category').forEach(section => {
+    let categoryCount = 0;
+
+    section.querySelectorAll('.card').forEach(card => {
+      const searchableText = normalize(card.dataset.name);
+      const matches = !query || searchableText.includes(query);
+
+      card.hidden = !matches;
+      if (matches) {
+        categoryCount++;
+        visibleCount++;
+      }
+    });
+
+    section.hidden = categoryCount === 0;
+  });
+
+  clearSearch.hidden = !query;
+  noResults.hidden = visibleCount !== 0;
+  searchCount.textContent = `${visibleCount} ${visibleCount === 1 ? 'bebida' : 'bebidas'}`;
+}
+
+productSearch.addEventListener('input', () => {
+  stopActiveVoice();
+  filterProducts();
+});
+
+clearSearch.addEventListener('click', () => {
+  productSearch.value = '';
+  filterProducts();
+  productSearch.focus();
+});
 
 function value(product, field) {
   return Number(document.querySelector(
@@ -171,6 +212,8 @@ $('#reset').addEventListener('click', () => {
   $$('input[data-p]').forEach(input => input.value = '');
   responsibleInput.value = '';
   dateInput.value = new Date().toISOString().slice(0, 10);
+  productSearch.value = '';
+  filterProducts();
   stopActiveVoice();
   $$('[data-voice-ok]').forEach(button => {
     button.classList.remove('done');
@@ -514,6 +557,7 @@ function finishVoice(product) {
 
 render();
 calculate();
+filterProducts();
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('service-worker.js'));

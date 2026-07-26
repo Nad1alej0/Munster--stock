@@ -1,6 +1,15 @@
-# Munster Stock v1.2
+# Munster Stock v1.2.1
 
 Aplicación web para el control diario de aguas, aguas saborizadas y gaseosas.
+
+## Novedades de la versión 1.2.1
+
+- Buscador instantáneo de bebidas.
+- Filtrado sin importar mayúsculas ni tildes.
+- Contador de resultados.
+- Botón para limpiar la búsqueda.
+- Categorías que se ocultan cuando no contienen coincidencias.
+- Buscador visible mientras se recorre la lista.
 
 ## Novedades de la versión 1.2
 

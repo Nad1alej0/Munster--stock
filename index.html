@@ -44,7 +44,26 @@
     <button class="danger" id="reset">➕ Nuevo conteo</button>
   </div>
 
+  <section class="search-panel" aria-label="Buscar bebidas">
+    <div class="search-box">
+      <span class="search-icon" aria-hidden="true">⌕</span>
+      <input
+        id="productSearch"
+        type="search"
+        placeholder="Buscar bebida…"
+        autocomplete="off"
+        aria-label="Buscar bebida">
+      <button id="clearSearch" type="button" aria-label="Limpiar búsqueda" hidden>×</button>
+    </div>
+    <span id="searchCount">19 bebidas</span>
+  </section>
+
   <div id="voiceStatus" role="status" aria-live="polite"></div>
+  <div id="noResults" hidden>
+    <span aria-hidden="true">🔎</span>
+    <strong>No encontramos esa bebida</strong>
+    <small>Probá con otro nombre o limpiá la búsqueda.</small>
+  </div>
   <div id="products"></div>
 
   <section class="summary">
@@ -62,7 +81,7 @@
     <button class="qr-button" id="showQr">▦ Generar QR del resumen</button>
   </div>
 
-  <footer>Munster Stock v1.2</footer>
+  <footer>Munster Stock v1.2.1</footer>
 </main>
 
 <div class="modal" id="qrModal" hidden>

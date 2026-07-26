@@ -85,6 +85,84 @@ button{
 .secondary{background:#fff;color:var(--g);border:1px solid var(--g)}
 .qr-button{background:var(--g);color:#fff;border:1px solid var(--g)}
 .danger{background:#fff0ef;color:var(--bad)}
+.search-panel{
+  position:sticky;
+  top:77px;
+  z-index:4;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:10px 0 12px;
+  padding:9px;
+  border:1px solid rgba(18,60,46,.12);
+  border-radius:14px;
+  background:rgba(245,241,232,.95);
+  box-shadow:0 7px 18px rgba(20,50,39,.08);
+  backdrop-filter:blur(8px);
+}
+.search-box{
+  position:relative;
+  flex:1;
+}
+.search-box input{
+  height:46px;
+  padding:10px 45px 10px 43px;
+  border:2px solid transparent;
+  box-shadow:0 3px 12px rgba(20,50,39,.08);
+}
+.search-box input:focus{
+  outline:none;
+  border-color:#6ea58d;
+  box-shadow:0 0 0 4px rgba(29,91,67,.12);
+}
+.search-icon{
+  position:absolute;
+  left:14px;
+  top:50%;
+  z-index:1;
+  transform:translateY(-50%);
+  color:var(--g);
+  font-size:25px;
+  line-height:1;
+}
+#clearSearch{
+  position:absolute;
+  right:7px;
+  top:50%;
+  width:34px;
+  height:34px;
+  padding:0;
+  transform:translateY(-50%);
+  border-radius:50%;
+  background:#eef2f0;
+  color:var(--g);
+  font-size:23px;
+  line-height:1;
+}
+#searchCount{
+  flex:0 0 auto;
+  min-width:72px;
+  color:var(--muted);
+  text-align:center;
+  font-size:12px;
+  font-weight:800;
+}
+#noResults{
+  display:grid;
+  place-items:center;
+  gap:5px;
+  margin:22px 0;
+  padding:28px 18px;
+  border:1px dashed #b9c9c1;
+  border-radius:16px;
+  background:rgba(255,255,255,.65);
+  color:var(--muted);
+  text-align:center;
+}
+#noResults[hidden]{display:none}
+#noResults>span{font-size:30px}
+#noResults strong{color:#26342e}
+#noResults small{font-size:12px}
 .category h2{font-size:16px;margin:18px 3px 7px}
 .card{
   padding:11px;
@@ -283,4 +361,6 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:18px 0 0}
   .voice-controls button{padding:7px 8px}
   .bottom{flex-direction:column}
   .bottom button{width:100%;min-width:0}
+  .search-panel{top:76px}
+  #searchCount{min-width:58px;font-size:11px}
 }
