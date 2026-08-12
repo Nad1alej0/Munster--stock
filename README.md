@@ -1,6 +1,13 @@
-# Munster Stock v1.2.1
+# Munster Stock v1.3
 
 Aplicación web para el control diario de aguas, aguas saborizadas y gaseosas.
+
+## Novedades de la versión 1.3
+
+- Resumen de WhatsApp y QR separado en “ME FALTAN” y “ME SOBRAN”.
+- Descarga opcional de un informe PDF.
+- El PDF muestra bebida, sistema, total físico y diferencia.
+- Los informes no se guardan ni se acumulan dentro de la aplicación.
 
 ## Novedades de la versión 1.2.1
 
@@ -27,10 +34,11 @@ Aplicación web para el control diario de aguas, aguas saborizadas y gaseosas.
 - Actualización automática de la caché instalada.
 
 El generador QR incluido utiliza `qrcode-generator` de Kazuhiko Arase, bajo licencia MIT.
+La generación de PDF utiliza `jsPDF`, bajo licencia MIT.
 
 ## Publicación con GitHub Pages
 
-1. Subir todos estos archivos a la raíz del repositorio `munster-stock`.
+1. Subir todos estos archivos a la raíz del repositorio `Munster--stock`.
 2. Entrar en **Settings**.
 3. Entrar en **Pages**.
 4. En **Build and deployment**, elegir **Deploy from a branch**.
@@ -39,4 +47,4 @@ El generador QR incluido utiliza `qrcode-generator` de Kazuhiko Arase, bajo lice
 
 La dirección será:
 
-https://nad1alej0.github.io/munster-stock/
+https://nad1alej0.github.io/Munster--stock/

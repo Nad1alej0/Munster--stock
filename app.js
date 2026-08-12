@@ -250,14 +250,22 @@ function shareText(data) {
   text += `🟡 Con sobrantes: ${extra}\n`;
 
   if (differences.length) {
-    text += '\n*DIFERENCIAS*\n\n';
-    differences.forEach(item => {
-      text += `${item.difference < 0 ? '🔴' : '🟡'} ${item.name}: ${
-        item.difference < 0
-          ? 'faltan ' + Math.abs(item.difference)
-          : 'sobran ' + item.difference
-      }\n`;
-    });
+    const missingItems = differences.filter(item => item.difference < 0);
+    const extraItems = differences.filter(item => item.difference > 0);
+
+    if (missingItems.length) {
+      text += '\n🔴 *ME FALTAN*\n';
+      missingItems.forEach(item => {
+        text += `• ${item.name}: ${Math.abs(item.difference)}\n`;
+      });
+    }
+
+    if (extraItems.length) {
+      text += '\n🟡 *ME SOBRAN*\n';
+      extraItems.forEach(item => {
+        text += `• ${item.name}: ${item.difference}\n`;
+      });
+    }
   } else if (loaded.length) {
     text += '\n✅ Todo el stock físico coincide con el sistema.';
   } else {
@@ -266,6 +274,189 @@ function shareText(data) {
 
   return text;
 }
+
+function loadedItems(data) {
+  return data.items.filter(item => {
+    const productInputs = $$(`input[data-p="${item.name}"]`);
+    return productInputs.some(input => input.value !== '');
+  });
+}
+
+function safeFilenamePart(value) {
+  return (value || 'Sin-responsable')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function downloadPdf(data) {
+  if (!window.jspdf?.jsPDF) {
+    alert('No pude preparar el PDF. Actualizá la aplicación y volvé a intentar.');
+    return;
+  }
+
+  const items = loadedItems(data);
+  if (!items.length) {
+    alert('Primero cargá al menos una bebida para generar el PDF.');
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 14;
+  const usableWidth = pageWidth - margin * 2;
+  const formattedDate = data.date
+    ? data.date.split('-').reverse().join('/')
+    : 'Sin indicar';
+  const missingItems = items.filter(item => item.difference < 0);
+  const extraItems = items.filter(item => item.difference > 0);
+  const correct = items.filter(item => item.difference === 0).length;
+  let y = 0;
+
+  function header() {
+    doc.setFillColor(18, 60, 46);
+    doc.rect(0, 0, pageWidth, 30, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(19);
+    doc.text('MUNSTER STOCK', margin, 13);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text('Informe de control de bebidas', margin, 21);
+    doc.setTextColor(24, 33, 29);
+    y = 40;
+  }
+
+  function newPageIfNeeded(requiredHeight) {
+    if (y + requiredHeight <= pageHeight - 15) return;
+    doc.addPage();
+    header();
+  }
+
+  function sectionTitle(title, color) {
+    newPageIfNeeded(13);
+    doc.setFillColor(...color);
+    doc.roundedRect(margin, y, usableWidth, 9, 2, 2, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text(title, margin + 4, y + 6);
+    doc.setTextColor(24, 33, 29);
+    y += 13;
+  }
+
+  function differenceList(title, list, color) {
+    if (!list.length) return;
+    sectionTitle(title, color);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    list.forEach(item => {
+      newPageIfNeeded(7);
+      const amount = Math.abs(item.difference);
+      doc.text(`• ${item.name}: ${amount}`, margin + 3, y + 4);
+      y += 7;
+    });
+    y += 3;
+  }
+
+  header();
+
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Fecha:', margin, y);
+  doc.text('Turno:', margin + 62, y);
+  doc.text('Responsable:', margin + 112, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(formattedDate, margin + 15, y);
+  doc.text(data.shift || 'Sin indicar', margin + 76, y);
+  doc.text(data.responsible || 'Sin indicar', margin + 137, y);
+  y += 10;
+
+  const boxWidth = (usableWidth - 9) / 4;
+  const totals = [
+    ['Controlados', items.length],
+    ['Correctos', correct],
+    ['Faltantes', missingItems.length],
+    ['Sobrantes', extraItems.length]
+  ];
+  totals.forEach(([label, number], index) => {
+    const x = margin + index * (boxWidth + 3);
+    doc.setFillColor(244, 247, 245);
+    doc.roundedRect(x, y, boxWidth, 18, 2, 2, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.text(String(number), x + boxWidth / 2, y + 8, { align: 'center' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text(label, x + boxWidth / 2, y + 14, { align: 'center' });
+  });
+  y += 25;
+
+  differenceList('ME FALTAN', missingItems, [179, 38, 30]);
+  differenceList('ME SOBRAN', extraItems, [184, 125, 16]);
+
+  sectionTitle('DETALLE DEL CONTEO', [18, 60, 46]);
+  const columns = [margin, margin + 83, margin + 112, margin + 148, pageWidth - margin];
+
+  function tableHeader() {
+    doc.setFillColor(234, 244, 239);
+    doc.rect(margin, y, usableWidth, 9, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.text('Bebida', columns[0] + 2, y + 6);
+    doc.text('Sistema', columns[2] - 2, y + 6, { align: 'right' });
+    doc.text('Físico', columns[3] - 2, y + 6, { align: 'right' });
+    doc.text('Diferencia', columns[4] - 2, y + 6, { align: 'right' });
+    y += 9;
+  }
+
+  tableHeader();
+  items.forEach((item, index) => {
+    if (y + 8 > pageHeight - 15) {
+      doc.addPage();
+      header();
+      tableHeader();
+    }
+    if (index % 2 === 1) {
+      doc.setFillColor(248, 249, 248);
+      doc.rect(margin, y, usableWidth, 8, 'F');
+    }
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    const name = doc.splitTextToSize(item.name, 78)[0];
+    doc.text(name, columns[0] + 2, y + 5.5);
+    doc.text(String(item.system), columns[2] - 2, y + 5.5, { align: 'right' });
+    doc.text(String(item.physical), columns[3] - 2, y + 5.5, { align: 'right' });
+    const difference = item.difference > 0 ? `+${item.difference}` : String(item.difference);
+    if (item.difference < 0) doc.setTextColor(179, 38, 30);
+    else if (item.difference > 0) doc.setTextColor(169, 96, 0);
+    else doc.setTextColor(46, 125, 50);
+    doc.setFont('helvetica', 'bold');
+    doc.text(difference, columns[4] - 2, y + 5.5, { align: 'right' });
+    doc.setTextColor(24, 33, 29);
+    doc.setDrawColor(223, 230, 226);
+    doc.line(margin, y + 8, pageWidth - margin, y + 8);
+    y += 8;
+  });
+
+  const pageCount = doc.getNumberOfPages();
+  for (let page = 1; page <= pageCount; page++) {
+    doc.setPage(page);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(104, 117, 111);
+    doc.text(`Munster Stock • Página ${page} de ${pageCount}`, pageWidth / 2, pageHeight - 7, { align: 'center' });
+  }
+
+  const dateForFile = data.date || new Date().toISOString().slice(0, 10);
+  const filename = `Munster-Stock_${dateForFile}_${safeFilenamePart(data.shift)}_${safeFilenamePart(data.responsible)}.pdf`;
+  doc.save(filename);
+}
+
+$('#downloadPdf').addEventListener('click', () => downloadPdf(collectData()));
 
 $('#share').addEventListener('click', async () => {
   const text = shareText(collectData());

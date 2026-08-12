@@ -84,6 +84,7 @@ button{
 .primary{background:var(--g);color:#fff}
 .secondary{background:#fff;color:var(--g);border:1px solid var(--g)}
 .qr-button{background:var(--g);color:#fff;border:1px solid var(--g)}
+.pdf-button{background:#f0e6cf;color:#5d4516;border:1px solid #d8c295}
 .danger{background:#fff0ef;color:var(--bad)}
 .search-panel{
   position:sticky;
