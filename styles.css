@@ -86,6 +86,14 @@ button{
 .qr-button{background:var(--g);color:#fff;border:1px solid var(--g)}
 .pdf-button{background:#f0e6cf;color:#5d4516;border:1px solid #d8c295}
 .danger{background:#fff0ef;color:var(--bad)}
+.view-tabs{display:flex;gap:8px;margin:12px 0 0}
+.view-tabs button{flex:1;background:#fff;color:var(--g);border:1px solid #c9d8d0}
+.view-tabs button.active{background:var(--g);color:#fff}
+#reviewCount{display:inline-block;padding:1px 7px;border-radius:20px;background:#f0e6cf;color:#5d4516}
+#emptyReview{padding:25px 16px;background:#fff;border-radius:14px;text-align:center;color:var(--muted);margin:15px 0}
+#emptyReview[hidden]{display:none}
+.review-check{display:flex;align-items:center;gap:7px;width:max-content;max-width:100%;margin:0 0 8px auto;padding:6px 10px;border:1px solid #d6c79d;border-radius:9px;background:#fff9eb;color:#725118;font-size:12px;cursor:pointer}
+.review-check input{width:17px;height:17px;margin:0;accent-color:var(--g)}
 .search-panel{
   position:sticky;
   top:77px;
@@ -176,33 +184,13 @@ button{
 .card.state-warn{border-color:#e8c27c;background:#fffaf1}
 .title{
   display:grid;
-  grid-template-columns:minmax(0,1fr) auto auto;
+  grid-template-columns:minmax(0,1fr) auto;
   align-items:center;
   gap:10px;
   font-weight:900;
   margin-bottom:9px;
 }
 .product-name{min-width:0}
-.voice-controls{display:flex;gap:6px;align-items:center}
-.voice-controls button{
-  padding:7px 9px;
-  border-radius:9px;
-  font-size:12px;
-  white-space:nowrap;
-}
-.voice-toggle{background:#eaf4ef;color:var(--g);border:1px solid #c7ddd3}
-.voice-toggle.listening{
-  background:#ffe9e7;
-  color:var(--bad);
-  border-color:#efaaa5;
-  animation:pulse 1.4s infinite;
-}
-.voice-ok{background:#f4f7f5;color:var(--muted);border:1px solid var(--line)}
-.voice-ok.done{background:#e8f5e9;color:var(--ok);border-color:#96d29a}
-.card.voice-complete{box-shadow:0 8px 24px rgba(20,50,39,.08),inset 4px 0 #2e7d32}
-@keyframes pulse{
-  50%{box-shadow:0 0 0 4px rgba(179,38,30,.12)}
-}
 .status{
   font-size:12px;
   padding:4px 8px;
@@ -243,18 +231,6 @@ button{
 .sumgrid span{display:block;font-size:22px;font-weight:900}
 .sumgrid small{color:var(--muted)}
 .bottom button{flex:1;min-width:220px;padding:14px}
-#voiceStatus{
-  display:none;
-  background:#eaf4ef;
-  color:var(--g);
-  padding:10px;
-  border-radius:10px;
-  margin-bottom:10px;
-}
-#voiceStatus.listening{background:#ffe9e7;color:var(--bad)}
-#voiceStatus.paused{background:#fff4dd;color:var(--warn)}
-#voiceStatus.success{background:#e8f5e9;color:var(--ok)}
-#voiceStatus.error{background:#ffebee;color:var(--bad)}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:18px 0 0}
 .modal[hidden]{display:none}
 .modal{
@@ -359,7 +335,6 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:18px 0 0}
     gap:8px;
   }
   .title .status{grid-column:1/-1;justify-self:start}
-  .voice-controls button{padding:7px 8px}
   .bottom{flex-direction:column}
   .bottom button{width:100%;min-width:0}
   .search-panel{top:76px}

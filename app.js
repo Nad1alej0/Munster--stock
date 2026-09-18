@@ -1,5 +1,5 @@
 
-const PRODUCTS = [["Aguas", "Agua sin gas"], ["Aguas", "Agua con gas"], ["Aguas saborizadas", "Agua saborizada pomelo"], ["Aguas saborizadas", "Agua saborizada pera"], ["Aguas saborizadas", "Agua saborizada manzana"], ["Aguas saborizadas", "Agua saborizada naranja"], ["Aguas saborizadas", "Agua saborizada limonada"], ["Gaseosas", "Coca-Cola"], ["Gaseosas", "Coca-Cola Zero"], ["Gaseosas", "Pepsi"], ["Gaseosas", "Pepsi Black"], ["Gaseosas", "Fanta"], ["Gaseosas", "Mirinda"], ["Gaseosas", "Sprite"], ["Gaseosas", "7 Up"], ["Tónicas y pomelos", "Schweppes Tónica"], ["Tónicas y pomelos", "Schweppes Pomelo"], ["Tónicas y pomelos", "Paso de los Toros Tónica"], ["Tónicas y pomelos", "Paso de los Toros Pomelo"]];
+const PRODUCTS = [["Aguas", "Agua sin gas"], ["Aguas", "Agua con gas"], ["Aguas saborizadas", "Agua saborizada pera"], ["Aguas saborizadas", "Agua saborizada naranja"], ["Aguas saborizadas", "Ives manzana sin gas"], ["Aguas saborizadas", "Ives pomelo gasificado"], ["Aguas saborizadas", "H2O manzana"], ["Aguas saborizadas", "H2O limoneto"], ["Aguas saborizadas", "H2O pomelo rosado"], ["Gaseosas", "Coca-Cola"], ["Gaseosas", "Coca-Cola Zero"], ["Gaseosas", "Pepsi"], ["Gaseosas", "Pepsi Black"], ["Gaseosas", "Fanta"], ["Gaseosas", "Fanta Zero"], ["Gaseosas", "Mirinda"], ["Gaseosas", "Sprite"], ["Gaseosas", "7 Up"], ["Tónicas y pomelos", "Paso de los Toros Tónica"], ["Tónicas y pomelos", "Paso de los Toros Pomelo"]];
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
@@ -7,14 +7,11 @@ const dateInput = $('#date');
 const shiftInput = $('#shift');
 const responsibleInput = $('#resp');
 const productsContainer = $('#products');
-const voiceStatus = $('#voiceStatus');
 const productSearch = $('#productSearch');
 const clearSearch = $('#clearSearch');
 const searchCount = $('#searchCount');
 const noResults = $('#noResults');
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-let activeVoice = null;
+let reviewOnly = false;
 
 dateInput.value = new Date().toISOString().slice(0, 10);
 $('#totalProducts').textContent = PRODUCTS.length;
@@ -34,25 +31,12 @@ function render() {
         const k = key(name);
         return `
           <article class="card" data-name="${name}">
+            <label class="review-check">
+              <input type="checkbox" data-review="${name}">
+              <span>Revisar después</span>
+            </label>
             <div class="title">
               <span class="product-name">${name}</span>
-              <div class="voice-controls">
-                <button
-                  type="button"
-                  class="voice-toggle"
-                  data-voice-product="${name}"
-                  aria-label="Grabar conteo de ${name}">
-                  <span aria-hidden="true">🎤</span>
-                  <span class="voice-label">Grabar</span>
-                </button>
-                <button
-                  type="button"
-                  class="voice-ok"
-                  data-voice-ok="${name}"
-                  aria-label="Finalizar dictado de ${name}">
-                  ✓ OK
-                </button>
-              </div>
               <span class="status" id="st-${k}">Sin cargar</span>
             </div>
             <div class="grid">
@@ -85,12 +69,10 @@ function render() {
   `).join('');
 
   $$('input[data-p]').forEach(input => input.addEventListener('input', calculate));
-  $$('[data-voice-product]').forEach(button =>
-    button.addEventListener('click', () => toggleVoice(button.dataset.voiceProduct))
-  );
-  $$('[data-voice-ok]').forEach(button =>
-    button.addEventListener('click', () => finishVoice(button.dataset.voiceOk))
-  );
+  $$('input[data-review]').forEach(input => input.addEventListener('change', () => {
+    updateReviewCount();
+    filterProducts();
+  }));
 }
 
 function filterProducts() {
@@ -102,7 +84,8 @@ function filterProducts() {
 
     section.querySelectorAll('.card').forEach(card => {
       const searchableText = normalize(card.dataset.name);
-      const matches = !query || searchableText.includes(query);
+      const matches = (!query || searchableText.includes(query)) &&
+        (!reviewOnly || card.querySelector('input[data-review]').checked);
 
       card.hidden = !matches;
       if (matches) {
@@ -115,12 +98,28 @@ function filterProducts() {
   });
 
   clearSearch.hidden = !query;
-  noResults.hidden = visibleCount !== 0;
   searchCount.textContent = `${visibleCount} ${visibleCount === 1 ? 'bebida' : 'bebidas'}`;
+  $('#emptyReview').hidden = !reviewOnly || visibleCount !== 0 || Boolean(query);
+  noResults.hidden = visibleCount !== 0 || (reviewOnly && !query);
 }
 
+function updateReviewCount() {
+  const count = $$('input[data-review]:checked').length;
+  $('#reviewCount').textContent = count;
+}
+
+$$('[data-view]').forEach(button => button.addEventListener('click', () => {
+  reviewOnly = button.dataset.view === 'review';
+  productSearch.value = '';
+  $$('[data-view]').forEach(tab => {
+    const active = tab === button;
+    tab.classList.toggle('active', active);
+    tab.setAttribute('aria-selected', String(active));
+  });
+  filterProducts();
+}));
+
 productSearch.addEventListener('input', () => {
-  stopActiveVoice();
   filterProducts();
 });
 
@@ -210,17 +209,18 @@ $('#reset').addEventListener('click', () => {
   if (!accepted) return;
 
   $$('input[data-p]').forEach(input => input.value = '');
+  $$('input[data-review]').forEach(input => input.checked = false);
+  updateReviewCount();
+  reviewOnly = false;
+  $$('[data-view]').forEach(tab => {
+    const active = tab.dataset.view === 'all';
+    tab.classList.toggle('active', active);
+    tab.setAttribute('aria-selected', String(active));
+  });
   responsibleInput.value = '';
   dateInput.value = new Date().toISOString().slice(0, 10);
   productSearch.value = '';
   filterProducts();
-  stopActiveVoice();
-  $$('[data-voice-ok]').forEach(button => {
-    button.classList.remove('done');
-    button.textContent = '✓ OK';
-  });
-  $$('.card').forEach(card => card.classList.remove('voice-complete'));
-  voiceStatus.style.display = 'none';
   calculate();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
@@ -523,228 +523,6 @@ function normalize(text) {
   return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
-const SMALL_NUMBERS = {
-  cero: 0, un: 1, uno: 1, una: 1, dos: 2, tres: 3, cuatro: 4,
-  cinco: 5, seis: 6, siete: 7, ocho: 8, nueve: 9, diez: 10,
-  once: 11, doce: 12, trece: 13, catorce: 14, quince: 15,
-  dieciseis: 16, diecisiete: 17, dieciocho: 18, diecinueve: 19,
-  veinte: 20, veintiuno: 21, veintidos: 22, veintitres: 23,
-  veinticuatro: 24, veinticinco: 25, veintiseis: 26,
-  veintisiete: 27, veintiocho: 28, veintinueve: 29
-};
-
-const TENS = {
-  treinta: 30, cuarenta: 40, cincuenta: 50, sesenta: 60,
-  setenta: 70, ochenta: 80, noventa: 90
-};
-
-function parseSpokenNumber(text) {
-  const digit = text.match(/\d+/);
-  if (digit) return Number(digit[0]);
-
-  const words = normalize(text)
-    .replace(/[^a-z\s]/g, ' ')
-    .split(/\s+/)
-    .filter(Boolean);
-
-  let total = 0;
-  let found = false;
-
-  for (const word of words) {
-    if (word in SMALL_NUMBERS) {
-      total += SMALL_NUMBERS[word];
-      found = true;
-    } else if (word in TENS) {
-      total += TENS[word];
-      found = true;
-    } else if (word === 'cien') {
-      total += 100;
-      found = true;
-    } else if (word === 'ciento') {
-      total += 100;
-      found = true;
-    } else if (word === 'doscientos') {
-      total += 200;
-      found = true;
-    } else if (word === 'trescientos') {
-      total += 300;
-      found = true;
-    }
-  }
-
-  return found ? total : null;
-}
-
-const FIELD_ALIASES = {
-  'Sistema': ['sistema'],
-  'Salón': ['salon'],
-  'Depósito': ['deposito', 'depo'],
-  'Pasillo': ['pasillo', 'heladera pasillo', 'heladeras pasillo']
-};
-
-function setVoiceStatus(message, mode = '') {
-  voiceStatus.style.display = 'block';
-  voiceStatus.className = mode;
-  voiceStatus.textContent = message;
-}
-
-function resetVoiceButtons(exceptProduct = '') {
-  $$('[data-voice-product]').forEach(button => {
-    if (button.dataset.voiceProduct === exceptProduct) return;
-    button.classList.remove('listening');
-    button.querySelector('.voice-label').textContent = 'Grabar';
-    button.querySelector('[aria-hidden]').textContent = '🎤';
-  });
-}
-
-function stopActiveVoice() {
-  if (!activeVoice) return;
-  activeVoice.manuallyStopped = true;
-  try {
-    activeVoice.recognition.stop();
-  } catch (error) {
-    // El reconocimiento puede haberse detenido solo por silencio.
-  }
-  activeVoice = null;
-  resetVoiceButtons();
-}
-
-function loadVoicePhrase(product, transcript) {
-  const normalized = normalize(transcript);
-  const aliases = Object.values(FIELD_ALIASES).flat()
-    .sort((a, b) => b.length - a.length)
-    .map(alias => alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-  const boundary = `(?=${aliases.join('|')}|$)`;
-  let loaded = 0;
-
-  Object.entries(FIELD_ALIASES).forEach(([field, fieldAliases]) => {
-    for (const alias of fieldAliases.sort((a, b) => b.length - a.length)) {
-      const match = normalized.match(new RegExp(`${alias}\\s+(.+?)${boundary}`));
-      if (!match) continue;
-
-      const number = parseSpokenNumber(match[1]);
-      if (number !== null) {
-        document.querySelector(
-          `input[data-p="${product}"][data-f="${field}"]`
-        ).value = number;
-        loaded++;
-      }
-      break;
-    }
-  });
-
-  calculate();
-  return loaded;
-}
-
-function toggleVoice(product) {
-  if (!SpeechRecognition) {
-    alert('El dictado no está disponible aquí. En Android suele funcionar mejor desde Google Chrome.');
-    return;
-  }
-
-  if (activeVoice?.product === product) {
-    activeVoice.manuallyStopped = true;
-    activeVoice.recognition.stop();
-    const button = document.querySelector(`[data-voice-product="${product}"]`);
-    button.classList.remove('listening');
-    button.querySelector('.voice-label').textContent = 'Continuar';
-    button.querySelector('[aria-hidden]').textContent = '▶';
-    setVoiceStatus(`${product}: dictado pausado. Podés revisar los números y continuar.`, 'paused');
-    activeVoice = null;
-    return;
-  }
-
-  stopActiveVoice();
-  resetVoiceButtons(product);
-
-  const card = document.querySelector(`[data-name="${product}"]`);
-  const okButton = document.querySelector(`[data-voice-ok="${product}"]`);
-  card.classList.remove('voice-complete');
-  okButton.classList.remove('done');
-  okButton.textContent = '✓ OK';
-
-  const recognition = new SpeechRecognition();
-  recognition.lang = 'es-AR';
-  recognition.interimResults = false;
-  recognition.continuous = true;
-  recognition.maxAlternatives = 1;
-
-  const button = document.querySelector(`[data-voice-product="${product}"]`);
-  button.classList.add('listening');
-  button.querySelector('.voice-label').textContent = 'Pausar';
-  button.querySelector('[aria-hidden]').textContent = '⏸';
-
-  activeVoice = { product, recognition, manuallyStopped: false };
-  setVoiceStatus(`${product}: escuchando… Decí, por ejemplo, “Sistema veinte”.`, 'listening');
-
-  recognition.onresult = event => {
-    const transcripts = [];
-    let loaded = 0;
-
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      if (!event.results[i].isFinal) continue;
-      const transcript = event.results[i][0].transcript;
-      transcripts.push(transcript);
-      loaded += loadVoicePhrase(product, transcript);
-    }
-
-    if (!transcripts.length) return;
-    setVoiceStatus(
-      loaded
-        ? `${product}: cargado “${transcripts.join(' ')}”.`
-        : `${product}: escuché “${transcripts.join(' ')}”, pero no reconocí ubicación y número.`,
-      loaded ? 'success' : 'error'
-    );
-  };
-
-  recognition.onerror = event => {
-    if (event.error === 'aborted') return;
-    setVoiceStatus(
-      event.error === 'not-allowed'
-        ? 'Necesito permiso para usar el micrófono. Permitilo en Chrome y volvé a intentar.'
-        : `${product}: no pude entender. Pausá y probá de nuevo.`,
-      'error'
-    );
-  };
-
-  recognition.onend = () => {
-    if (activeVoice?.recognition !== recognition) return;
-    activeVoice = null;
-    button.classList.remove('listening');
-    button.querySelector('.voice-label').textContent = 'Continuar';
-    button.querySelector('[aria-hidden]').textContent = '▶';
-    if (!button.closest('.card').classList.contains('voice-complete')) {
-      setVoiceStatus(`${product}: dictado pausado. Tocá Continuar o ✓ OK.`, 'paused');
-    }
-  };
-
-  try {
-    recognition.start();
-  } catch (error) {
-    activeVoice = null;
-    button.classList.remove('listening');
-    button.querySelector('.voice-label').textContent = 'Continuar';
-    button.querySelector('[aria-hidden]').textContent = '▶';
-    setVoiceStatus('No pude iniciar el micrófono. Esperá un segundo y volvé a tocar Continuar.', 'error');
-  }
-}
-
-function finishVoice(product) {
-  if (activeVoice?.product === product) stopActiveVoice();
-
-  const card = document.querySelector(`[data-name="${product}"]`);
-  const okButton = document.querySelector(`[data-voice-ok="${product}"]`);
-  const voiceButton = document.querySelector(`[data-voice-product="${product}"]`);
-
-  card.classList.add('voice-complete');
-  okButton.classList.add('done');
-  okButton.textContent = '✓ Listo';
-  voiceButton.classList.remove('listening');
-  voiceButton.querySelector('.voice-label').textContent = 'Grabar';
-  voiceButton.querySelector('[aria-hidden]').textContent = '🎤';
-  setVoiceStatus(`${product}: dictado finalizado.`, 'success');
-}
 
 render();
 calculate();

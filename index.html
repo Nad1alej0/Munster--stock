@@ -44,6 +44,11 @@
     <button class="danger" id="reset">➕ Nuevo conteo</button>
   </div>
 
+  <nav class="view-tabs" role="tablist" aria-label="Vistas del conteo">
+    <button type="button" role="tab" data-view="all" aria-selected="true" class="active">Todas las bebidas</button>
+    <button type="button" role="tab" data-view="review" aria-selected="false">Para revisar <span id="reviewCount">0</span></button>
+  </nav>
+
   <section class="search-panel" aria-label="Buscar bebidas">
     <div class="search-box">
       <span class="search-icon" aria-hidden="true">⌕</span>
@@ -55,21 +60,21 @@
         aria-label="Buscar bebida">
       <button id="clearSearch" type="button" aria-label="Limpiar búsqueda" hidden>×</button>
     </div>
-    <span id="searchCount">19 bebidas</span>
+    <span id="searchCount">20 bebidas</span>
   </section>
 
-  <div id="voiceStatus" role="status" aria-live="polite"></div>
   <div id="noResults" hidden>
     <span aria-hidden="true">🔎</span>
     <strong>No encontramos esa bebida</strong>
     <small>Probá con otro nombre o limpiá la búsqueda.</small>
   </div>
+  <div id="emptyReview" hidden>Cuando tildes “Revisar después” en una bebida, aparecerá acá para volver a contarla.</div>
   <div id="products"></div>
 
   <section class="summary">
     <h2>Resumen</h2>
     <div class="sumgrid">
-      <div><span id="totalProducts">19</span><small>Productos</small></div>
+      <div><span id="totalProducts">20</span><small>Productos</small></div>
       <div><span id="okc">0</span><small>Correctos</small></div>
       <div><span id="missc">0</span><small>Faltantes</small></div>
       <div><span id="extrac">0</span><small>Sobrantes</small></div>
@@ -82,7 +87,7 @@
     <button class="pdf-button" id="downloadPdf">📄 Descargar PDF</button>
   </div>
 
-  <footer>Munster Stock v1.3</footer>
+  <footer>Munster Stock v1.4.1</footer>
 </main>
 
 <div class="modal" id="qrModal" hidden>
