@@ -85,6 +85,7 @@ button{
 .secondary{background:#fff;color:var(--g);border:1px solid var(--g)}
 .qr-button{background:var(--g);color:#fff;border:1px solid var(--g)}
 .pdf-button{background:#f0e6cf;color:#5d4516;border:1px solid #d8c295}
+.detail-button{background:#eaf4ef;color:var(--g);border:1px solid #8ab7a3}
 .danger{background:#fff0ef;color:var(--bad)}
 .view-tabs{display:flex;gap:8px;margin:12px 0 0}
 .view-tabs button{flex:1;background:#fff;color:var(--g);border:1px solid #c9d8d0}

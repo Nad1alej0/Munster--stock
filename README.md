@@ -1,6 +1,17 @@
-# Munster Stock v1.4.1
+# Munster Stock v1.5
 
 Aplicación web para el control diario de aguas, aguas saborizadas y gaseosas.
+
+## Novedades de la versión 1.5
+
+- Nueva opción «WhatsApp con cantidades».
+- El informe detallado incluye únicamente las bebidas con diferencias.
+- Para cada diferencia muestra cantidad del sistema, total físico y diferencia.
+- Se conserva por separado el resumen rápido de WhatsApp.
+
+## Novedades de la versión 1.4.2
+
+- Se agregó 7 Up Zero al catálogo de gaseosas.
 
 ## Novedades de la versión 1.4.1
 

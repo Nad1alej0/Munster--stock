@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'munster-stock-v1.4.1';
+const CACHE_NAME = 'munster-stock-v1.5';
 const ASSETS = [
   './',
   './index.html',

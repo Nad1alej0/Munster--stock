@@ -1,5 +1,5 @@
 
-const PRODUCTS = [["Aguas", "Agua sin gas"], ["Aguas", "Agua con gas"], ["Aguas saborizadas", "Agua saborizada pera"], ["Aguas saborizadas", "Agua saborizada naranja"], ["Aguas saborizadas", "Ives manzana sin gas"], ["Aguas saborizadas", "Ives pomelo gasificado"], ["Aguas saborizadas", "H2O manzana"], ["Aguas saborizadas", "H2O limoneto"], ["Aguas saborizadas", "H2O pomelo rosado"], ["Gaseosas", "Coca-Cola"], ["Gaseosas", "Coca-Cola Zero"], ["Gaseosas", "Pepsi"], ["Gaseosas", "Pepsi Black"], ["Gaseosas", "Fanta"], ["Gaseosas", "Fanta Zero"], ["Gaseosas", "Mirinda"], ["Gaseosas", "Sprite"], ["Gaseosas", "7 Up"], ["Tónicas y pomelos", "Paso de los Toros Tónica"], ["Tónicas y pomelos", "Paso de los Toros Pomelo"]];
+const PRODUCTS = [["Aguas", "Agua sin gas"], ["Aguas", "Agua con gas"], ["Aguas saborizadas", "Agua saborizada pera"], ["Aguas saborizadas", "Agua saborizada naranja"], ["Aguas saborizadas", "Ives manzana sin gas"], ["Aguas saborizadas", "Ives pomelo gasificado"], ["Aguas saborizadas", "H2O manzana"], ["Aguas saborizadas", "H2O limoneto"], ["Aguas saborizadas", "H2O pomelo rosado"], ["Gaseosas", "Coca-Cola"], ["Gaseosas", "Coca-Cola Zero"], ["Gaseosas", "Pepsi"], ["Gaseosas", "Pepsi Black"], ["Gaseosas", "Fanta"], ["Gaseosas", "Fanta Zero"], ["Gaseosas", "Mirinda"], ["Gaseosas", "Sprite"], ["Gaseosas", "7 Up"], ["Gaseosas", "7 Up Zero"], ["Tónicas y pomelos", "Paso de los Toros Tónica"], ["Tónicas y pomelos", "Paso de los Toros Pomelo"]];
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
@@ -275,6 +275,44 @@ function shareText(data) {
   return text;
 }
 
+function detailedDifferencesText(data) {
+  const differences = loadedItems(data).filter(item => item.difference !== 0);
+  const formattedDate = data.date
+    ? data.date.split('-').reverse().join('/')
+    : 'Sin indicar';
+
+  let text = '☘️ *MUNSTER STOCK – DETALLE DE DIFERENCIAS*\n\n';
+  text += `📅 Fecha: ${formattedDate}\n`;
+  text += `🕐 Turno: ${data.shift}\n`;
+  text += `👤 Responsable: ${data.responsible || 'Sin indicar'}\n`;
+
+  if (!differences.length) {
+    text += '\n✅ No hay bebidas con diferencias.';
+    return text;
+  }
+
+  const missingItems = differences.filter(item => item.difference < 0);
+  const extraItems = differences.filter(item => item.difference > 0);
+
+  if (missingItems.length) {
+    text += '\n🔴 *ME FALTAN*\n';
+    missingItems.forEach(item => {
+      text += `• *${item.name}*\n`;
+      text += `  Sistema: ${item.system} | Físico: ${item.physical} | Diferencia: ${item.difference}\n`;
+    });
+  }
+
+  if (extraItems.length) {
+    text += '\n🟡 *ME SOBRAN*\n';
+    extraItems.forEach(item => {
+      text += `• *${item.name}*\n`;
+      text += `  Sistema: ${item.system} | Físico: ${item.physical} | Diferencia: +${item.difference}\n`;
+    });
+  }
+
+  return text;
+}
+
 function loadedItems(data) {
   return data.items.filter(item => {
     const productInputs = $$(`input[data-p="${item.name}"]`);
@@ -464,6 +502,21 @@ $('#share').addEventListener('click', async () => {
   if (navigator.share) {
     try {
       await navigator.share({ title: 'Munster Stock', text });
+      return;
+    } catch (error) {
+      // El usuario puede cancelar el selector de compartir.
+    }
+  }
+
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+});
+
+$('#shareDetails').addEventListener('click', async () => {
+  const text = detailedDifferencesText(collectData());
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'Munster Stock – Diferencias', text });
       return;
     } catch (error) {
       // El usuario puede cancelar el selector de compartir.
