@@ -1,6 +1,10 @@
-# Munster Stock v1.5
+# Munster Stock v1.6
 
 Aplicación web para el control diario de aguas, aguas saborizadas y gaseosas.
+
+## Novedades de la versión 1.6
+
+- Se agregaron Benedictino sin gas y Benedictino con gas al catálogo de aguas.
 
 ## Novedades de la versión 1.5
 
